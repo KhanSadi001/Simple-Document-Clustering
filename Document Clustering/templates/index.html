@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document Clustering</title>
+    <!-- Bootstrap for quick styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 30px;
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
+            min-height: 100vh;
+            color: #fff;
+        }
+        h1, h2 {
+            color: #fff;
+        }
+        .cluster-box {
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: rgba(255,255,255,0.9);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            color: #2d3436;
+            transition: transform 0.2s ease-in-out;
+        }
+        .cluster-box:hover {
+            transform: scale(1.02);
+        }
+        .cluster-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #0984e3;
+        }
+        .keyword {
+            background: #ffeaa7;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 3px;
+            display: inline-block;
+            font-weight: 500;
+            color: #2d3436;
+            transition: background 0.2s ease;
+        }
+        .keyword:hover {
+            background: #fab1a0;
+        }
+        textarea, input, .form-control {
+            border-radius: 8px !important;
+        }
+        .btn-primary {
+            background-color: #6c5ce7;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #5e4fc2;
+        }
+        .btn-success {
+            background-color: #00b894;
+            border: none;
+        }
+        .btn-success:hover {
+            background-color: #019875;
+        }
+        .form-label{
+            color: #5e4fc2;
+        }
+    </style>
+</head>
+<body>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <div class="container">
+        <h1 class="text-center mb-4">Document Clustering App</h1>
+        <p class="text-center text-light">Upload text documents or paste text below to cluster them using KMeans & TF-IDF.</p>
+
+        <!-- Input Form -->
+        <form method="POST" enctype="multipart/form-data" class="mb-4 bg-light p-4 rounded shadow">
+            <div class="mb-3">
+                <label class="form-label">Upload Text Files</label>
+                <input type="file" name="files" class="form-control" multiple accept=".txt">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Or Paste Text (one document per line)</label>
+                <textarea name="pasted_text" class="form-control" rows="5" placeholder="Document 1\nDocument 2\nDocument 3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Number of Clusters (K)</label>
+                <input type="number" name="k" class="form-control" min="2" max="10" value="3">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Cluster Documents</button>
+        </form>
+
+        <!-- Output Results -->
+        {% if clusters %}
+            <h2 class="mb-3">Clustering Results</h2>
+            {% for cluster_id, data in clusters.items() %}
+                <div class="cluster-box">
+                    <div class="cluster-title">Cluster {{ cluster_id + 1 }}</div>
+                    <ul>
+                        {% for doc in data.documents %}
+                            <li>{{ doc }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div>
+                        <strong>Top Keywords:</strong>
+                        {% for kw in data.keywords %}
+                            <span class="keyword">{{ kw }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Refresh Button -->
+            <form action="/" method="get">
+                <button type="submit" class="btn btn-success w-100">Refresh</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>
